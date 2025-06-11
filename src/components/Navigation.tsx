@@ -24,22 +24,22 @@ export const Navigation: React.FC = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-            <Link href={item.href} key={item.label} legacyBehavior>
-              <a 
-                className={cn(
-                  "flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background",
-                  item.color,
-                  isActive ? "ring-2 ring-offset-2 ring-primary" : "opacity-90 hover:opacity-100",
-                  "min-w-[70px] sm:min-w-[90px]" 
-                )}
-                aria-label={item.label}
-              >
-                <item.icon className="w-6 h-6 mb-1" />
-                <span className="text-xs sm:text-sm font-medium">
-                  {item.label}
-                  {item.isWallet && ` (${coinBalance})`}
-                </span>
-              </a>
+            <Link 
+              href={item.href} 
+              key={item.label}
+              className={cn(
+                "flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background",
+                item.color,
+                isActive ? "ring-2 ring-offset-2 ring-primary" : "opacity-90 hover:opacity-100",
+                "min-w-[70px] sm:min-w-[90px]" 
+              )}
+              aria-label={item.label}
+            >
+              <item.icon className="w-6 h-6 mb-1" />
+              <span className="text-xs sm:text-sm font-medium">
+                {item.label}
+                {item.isWallet && ` (${coinBalance})`}
+              </span>
             </Link>
           )}
           )}
@@ -48,3 +48,4 @@ export const Navigation: React.FC = () => {
     </nav>
   );
 };
+
