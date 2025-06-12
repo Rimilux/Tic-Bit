@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -104,18 +105,4 @@ body {
     @apply bg-background text-foreground;
     @apply font-body;
   }
-}
-
-/* Animation for Dynamic Ticker */
-@keyframes ticker-scroll {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.ticker-animation {
-  animation: ticker-scroll 30s linear infinite;
 }

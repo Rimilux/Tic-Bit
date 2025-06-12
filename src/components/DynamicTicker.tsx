@@ -41,7 +41,7 @@ export const DynamicTicker: React.FC = () => {
 
   return (
     <div className="bg-secondary text-secondary-foreground overflow-hidden whitespace-nowrap py-2 shadow">
-      <div className="inline-block ticker-animation">
+      <div className="inline-block animate-ticker-scroll">
         {tickerItems.map((item, index) => (
           <span key={index} className="mx-4 text-sm">
             {item}
