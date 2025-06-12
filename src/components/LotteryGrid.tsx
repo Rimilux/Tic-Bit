@@ -9,7 +9,10 @@ const TOTAL_TICKETS = 10000;
 const TICKETS_PER_PAGE = 500;
 
 const generateTicketId = (index: number): string => {
-  return (100000 + index).toString();
+  // Ticket numbers are 1-based, index is 0-based.
+  // We want tickets from 00001 to 10000.
+  // So if index is 0, ticket number is 1. If index is 9999, ticket number is 10000.
+  return (index + 1).toString().padStart(5, '0');
 };
 
 export const LotteryGrid: React.FC = () => {
