@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/context/AppContext";
 import { CheckCircle, Share2, UserPlus, Gift } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Task {
   id: string;
@@ -33,13 +33,13 @@ export default function TasksPage() {
   };
   
   // For daily check-in, persist completion state
-  useState(() => {
+  useEffect(() => {
     const today = new Date().toDateString();
     const lastCheckin = localStorage.getItem('ticbit_dailyCheckin');
     if (lastCheckin === today) {
       setCompletedTasks(prev => new Set(prev).add('daily'));
     }
-  });
+  }, []);
 
   const completeDailyCheckin = (task: Task) => {
      if (!completedTasks.has(task.id)) {
