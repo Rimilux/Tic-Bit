@@ -26,11 +26,15 @@ export default function EmojiPuzzlePage() {
     try {
       const data = await generateEmojiPuzzle({});
       setPuzzleData(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch emoji puzzle:", error);
+      let description = "Could not load a new puzzle. Please try again in a moment.";
+      if (error && typeof error.message === 'string' && (error.message.toLowerCase().includes('api key') || error.message.toLowerCase().includes('api_key'))) {
+        description = "Failed to load puzzle. Please ensure the API key is correctly set in your deployment environment (e.g., Vercel environment variables).";
+      }
       toast({
         title: "Error Loading Puzzle",
-        description: "Could not load a new puzzle. Please try again in a moment.",
+        description: description,
         variant: "destructive",
       });
       setPuzzleData(null);
@@ -51,13 +55,16 @@ export default function EmojiPuzzlePage() {
     setIsCorrect(correct);
     setRevealAnswer(true);
 
-    toast({
-      title: correct ? "That's Right!" : "Not Quite!",
-      description: correct 
-        ? `Great job! The answer is "${puzzleData.answer}".` 
-        : `The correct answer was "${puzzleData.answer}". Better luck next time!`,
-      variant: correct ? "default" : "destructive",
-    });
+    // No toast here, feedback is visual and in the reveal section.
+    // If you want toasts for correct/incorrect, add them back.
+    // For example:
+    // toast({
+    //   title: correct ? "That's Right!" : "Not Quite!",
+    //   description: correct 
+    //     ? `Great job! The answer is "${puzzleData.answer}".` 
+    //     : `The correct answer was "${puzzleData.answer}". Better luck next time!`,
+    //   variant: correct ? "default" : "destructive", // "default" can be "success" if you have one
+    // });
   };
 
   if (isLoading && !puzzleData) {
@@ -118,18 +125,18 @@ export default function EmojiPuzzlePage() {
                   const isSelected = selectedOption === option;
                   const isActualAnswer = option === puzzleData.answer;
                   
-                  let buttonStyle = "outline";
+                  let buttonStyle: "default" | "destructive" | "outline" | "secondary" = "outline";
                   if (revealAnswer) {
-                    if (isActualAnswer) buttonStyle = "default"; 
-                    if (isSelected && !isActualAnswer) buttonStyle = "destructive";
+                    if (isActualAnswer) buttonStyle = "default"; // Correct answer
+                    else if (isSelected && !isActualAnswer) buttonStyle = "destructive"; // Selected wrong answer
                   } else if (isSelected) {
-                     buttonStyle = "secondary"; 
+                     buttonStyle = "secondary"; // Temporarily selected before reveal
                   }
 
                   return (
                     <Button
                       key={index}
-                      variant={buttonStyle as any} 
+                      variant={buttonStyle}
                       className={`p-4 h-auto text-base sm:text-lg rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                         ${revealAnswer && isActualAnswer ? 'bg-green-500 hover:bg-green-600 text-white border-green-500' : ''}
                         ${revealAnswer && isSelected && !isActualAnswer ? 'bg-red-500 hover:bg-red-600 text-white border-red-500' : ''}
@@ -146,7 +153,10 @@ export default function EmojiPuzzlePage() {
               </div>
               {revealAnswer && (
                 <div className="mt-6 p-4 bg-accent/20 rounded-md border border-accent/30">
-                  <p className="text-lg font-semibold text-accent-foreground">
+                   <p className={`text-lg font-semibold ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                    {isCorrect ? "That's Right!" : "Not Quite!"}
+                  </p>
+                  <p className="text-md text-accent-foreground">
                     The answer is: <strong className="text-primary">{puzzleData.answer}</strong>
                   </p>
                   {showHint && !isCorrect && puzzleData.hint && (
@@ -161,7 +171,7 @@ export default function EmojiPuzzlePage() {
             !isLoading && (
               <div className="py-10 text-center">
                 <p className="text-xl text-destructive font-semibold">Oops! We couldn't load a puzzle.</p>
-                <p className="text-muted-foreground">Please try fetching a new one.</p>
+                <p className="text-muted-foreground">Please try fetching a new one, or check your API key configuration if deploying.</p>
               </div>
             )
           )}
