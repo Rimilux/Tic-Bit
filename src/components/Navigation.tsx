@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/', label: 'Games', icon: Gamepad2, color: 'bg-sky-500 hover:bg-sky-600 focus:ring-sky-400 text-white' },
+  { href: '/emoji-puzzle', label: 'Games', icon: Gamepad2, color: 'bg-sky-500 hover:bg-sky-600 focus:ring-sky-400 text-white' },
   { href: '/tasks', label: 'Tasks', icon: ListChecks, color: 'bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-400 text-white' },
   { href: '/profile', label: 'Profile', icon: UserCircle, color: 'bg-amber-400 hover:bg-amber-500 focus:ring-amber-300 text-slate-900' },
   { href: '/wallet', label: 'Wallet', icon: CircleDollarSign, color: 'bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-400 text-slate-900', isWallet: true },
@@ -22,7 +22,7 @@ export const Navigation: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || (item.href === "/emoji-puzzle" && pathname === "/"); // Consider / as active for games if emoji-puzzle is the main game page
             return (
             <Link 
               href={item.href} 
@@ -48,4 +48,3 @@ export const Navigation: React.FC = () => {
     </nav>
   );
 };
-
