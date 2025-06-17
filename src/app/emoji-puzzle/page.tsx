@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { generateEmojiPuzzle, type EmojiPuzzleOutput } from "@/ai/flows/emoji-puzzle-flow";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, Lightbulb } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 
 export default function EmojiPuzzlePage() {
@@ -14,6 +14,7 @@ export default function EmojiPuzzlePage() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [revealAnswer, setRevealAnswer] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const { toast } = useToast();
 
   const fetchNewPuzzle = useCallback(async () => {
@@ -21,8 +22,8 @@ export default function EmojiPuzzlePage() {
     setSelectedOption(null);
     setIsCorrect(null);
     setRevealAnswer(false);
+    setShowHint(false); // Reset hint visibility
     try {
-      // Pass an empty object as input if your schema is z.object({})
       const data = await generateEmojiPuzzle({});
       setPuzzleData(data);
     } catch (error) {
@@ -32,7 +33,7 @@ export default function EmojiPuzzlePage() {
         description: "Could not load a new puzzle. Please try again in a moment.",
         variant: "destructive",
       });
-      setPuzzleData(null); // Clear puzzle data on error
+      setPuzzleData(null);
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +84,7 @@ export default function EmojiPuzzlePage() {
             What famous phrase, movie, place, or thing do these emojis represent?
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-8 text-center">
+        <CardContent className="space-y-6 text-center">
           {puzzleData ? (
             <>
               <div 
@@ -92,6 +93,26 @@ export default function EmojiPuzzlePage() {
               >
                 {puzzleData.emojis}
               </div>
+
+              {puzzleData.hint && !revealAnswer && (
+                <div className="my-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowHint(true)} 
+                    disabled={showHint}
+                    className="text-sm"
+                  >
+                    <Lightbulb className="mr-2 h-4 w-4" /> 
+                    {showHint ? "Hint Revealed!" : "Show Hint"}
+                  </Button>
+                  {showHint && (
+                    <p className="mt-2 text-muted-foreground italic p-3 bg-accent/10 rounded-md">
+                      <strong>Hint:</strong> {puzzleData.hint}
+                    </p>
+                  )}
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {puzzleData.options.map((option, index) => {
                   const isSelected = selectedOption === option;
@@ -99,16 +120,16 @@ export default function EmojiPuzzlePage() {
                   
                   let buttonStyle = "outline";
                   if (revealAnswer) {
-                    if (isActualAnswer) buttonStyle = "default"; // Highlight correct green
-                    if (isSelected && !isActualAnswer) buttonStyle = "destructive"; // Highlight selected wrong red
+                    if (isActualAnswer) buttonStyle = "default"; 
+                    if (isSelected && !isActualAnswer) buttonStyle = "destructive";
                   } else if (isSelected) {
-                     buttonStyle = "secondary"; // Highlight selected before reveal
+                     buttonStyle = "secondary"; 
                   }
 
                   return (
                     <Button
                       key={index}
-                      variant={buttonStyle as any} // Cast because our logic defines a valid state
+                      variant={buttonStyle as any} 
                       className={`p-4 h-auto text-base sm:text-lg rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                         ${revealAnswer && isActualAnswer ? 'bg-green-500 hover:bg-green-600 text-white border-green-500' : ''}
                         ${revealAnswer && isSelected && !isActualAnswer ? 'bg-red-500 hover:bg-red-600 text-white border-red-500' : ''}
@@ -128,6 +149,11 @@ export default function EmojiPuzzlePage() {
                   <p className="text-lg font-semibold text-accent-foreground">
                     The answer is: <strong className="text-primary">{puzzleData.answer}</strong>
                   </p>
+                  {showHint && !isCorrect && puzzleData.hint && (
+                     <p className="mt-2 text-sm text-muted-foreground">
+                       (Hint was: {puzzleData.hint})
+                     </p>
+                  )}
                 </div>
               )}
             </>
@@ -142,7 +168,7 @@ export default function EmojiPuzzlePage() {
           <Button 
             onClick={fetchNewPuzzle} 
             disabled={isLoading} 
-            className="mt-8 w-full sm:w-auto text-lg py-6 sm:py-3 bg-primary hover:bg-primary/90"
+            className="mt-6 w-full sm:w-auto text-lg py-6 sm:py-3 bg-primary hover:bg-primary/90"
             size="lg"
           >
             <RefreshCw className={`mr-2 h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
